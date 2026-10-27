@@ -49,7 +49,19 @@ There are six scenarios. Clear air has no drift. Wet bulb is a sudden humidity b
 
 I implemented the project as a Next.js app in TypeScript, without a Python runtime or any API key. The statistics and the simulator are in lib/drift and lib/sim. The dashboard, the field desk, the results table, and this report all call those functions, so the numbers here are the same numbers the tests check. Vitest covers the detectors, the six scenarios on seed 11, and a refit on the labels that arrive after the drift. On the field desk I can change humidity bias, wind shift, how far the boundary rotates, and the label delay, and the same rule responds. The app is deployed at https://mlops-project-kohl.vercel.app. The code is at https://github.com/Nancy20052020/Mlops_project.
 
+![Home page of the Heliograph site, with the project title and a live humidity PSI chart](/images/report/home.jpg)
+
+*Figure 1. Home page of the deployed project.*
+
 The main screen replays one scenario. A cursor moves through the stream. One chart shows PSI and accuracy, and another compares the reference distribution with the current window. The recommended action is written out in a short note. A checkbox can show where the drift actually started. The monitor does not use that line. It only sees the features and the labels that have arrived.
+
+![Observatory on the wet-bulb scenario, with humidity shifted and the action set to inspect](/images/report/observatory-wet-bulb.jpg)
+
+*Figure 2. Observatory, wet bulb. Humidity has moved and the action is inspect.*
+
+![Field desk after rotating the decision boundary, with a retrain call and the refit comparison](/images/report/field-desk.jpg)
+
+*Figure 3. Field desk after a boundary change. A refit on the later labels lifts accuracy from 45.2% to 71.7%.*
 
 *True weights and the weights learned on seed 11. Wind, rotor speed, and power overlap, so the fit does not recover the exact values.*
 
@@ -71,6 +83,10 @@ Veering wind is the same kind of change, but slower. PSI crosses 0.25 at 240 sam
 
 Boundary break is the case where an input test cannot help. PSI at the end of the stream is 0.14, which is below the watch level, and the PSI rule never alarms. ECE rises 60 samples after the drift starts. Page-Hinkley follows at 80 samples, and the accuracy rule at 80. Window accuracy falls from about 79.2% to 45.6%. The action is retrain. Squall line trips both PSI and ECE at 60 samples. I label that case mixed, and the action is also retrain.
 
+![Observatory on boundary break, with overlapping vibration densities and a retrain action](/images/report/observatory-boundary.jpg)
+
+*Figure 4. Observatory, boundary break. The vibration densities still overlap, and the action is retrain.*
+
 Late letters repeats the boundary break with a label delay of 280 samples. PSI stays quiet. ECE alarms at 340 samples, Page-Hinkley at 360, and the accuracy rule at 360. All three are after the delay. A method that needs the label cannot detect the change before the label exists. During the wait the inputs still match the reference, which is useful to know, but it does not replace the missing labels.
 
 *Samples after the drift starts, seed 11. Silent means that rule never fired. The last column is the action at the end of the run.*
@@ -83,6 +99,10 @@ Late letters repeats the boundary break with a label delay of 280 samples. PSI s
 | Boundary break | Concept | Silent | 60 | 80 | 80 | Retrain |
 | Squall line | Mixed | 60 | 60 | 60 | 80 | Retrain |
 | Late letters | Concept | Silent | 340 | 360 | 360 | Retrain |
+
+![Protocol page showing zero false alarms in clear air, a humidity delay of 60, and 143 of 144 correct diagnoses](/images/report/protocol.jpg)
+
+*Figure 5. Protocol page for seed 11, with the 143 of 144 result across seeds 1 to 24.*
 
 > **Comparison with the baselines.** PSI catches Wet bulb and Veering wind, and it misses both concept-drift cases. The accuracy rule misses both covariate cases. On Late letters it is as late as ECE, because both of them wait for labels. Using the two signals together is what makes the action specific.
 

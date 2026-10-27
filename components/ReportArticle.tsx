@@ -120,6 +120,14 @@ function BlockView({ block, section }: { block: Block; section: number }) {
       </figure>
     );
   }
+  if (block.type === "shot") {
+    return (
+      <figure className="py-3">
+        <img src={block.src} alt={block.alt} className="w-full border border-ink/20" />
+        <figcaption className="mt-2 text-sm leading-6">{block.caption}</figcaption>
+      </figure>
+    );
+  }
   if (block.type === "figure") {
     return (
       <p>
