@@ -229,11 +229,25 @@ input[type="range"]::-moz-range-thumb {
   }
 
   .report-body p,
-  .report-body li {
+  .report-body li,
+  .report-body figcaption {
     font-size: 12pt !important;
     line-height: 1.5 !important;
     orphans: 3;
     widows: 3;
+  }
+
+  .report-body img {
+    display: block;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    border: 1px solid #444 !important;
+  }
+
+  .report-body figcaption {
+    font-size: 11pt !important;
+    margin-top: 4pt;
   }
 
   table,

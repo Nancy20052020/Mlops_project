@@ -35,6 +35,7 @@ export type Block =
   | { type: "callout"; kicker: string; text: string }
   | { type: "table"; caption: string; headers: string[]; rows: string[][] }
   | { type: "figure" }
+  | { type: "shot"; src: string; alt: string; caption: string }
   | { type: "refs"; items: string[] };
 
 export type ReportModel = {
@@ -119,8 +120,26 @@ export function buildReport(bench: BenchResult): ReportModel {
         text: `I implemented the project as a Next.js app in TypeScript, without a Python runtime or any API key. The statistics and the simulator are in lib/drift and lib/sim. The dashboard, the field desk, the results table, and this report all call those functions, so the numbers here are the same numbers the tests check. Vitest covers the detectors, the six scenarios on seed 11, and a refit on the labels that arrive after the drift. On the field desk I can change humidity bias, wind shift, how far the boundary rotates, and the label delay, and the same rule responds. The app is deployed at ${COURSE.vercel}. The code is at ${COURSE.github}.`,
       },
       {
+        type: "shot",
+        src: "/images/report/home.jpg",
+        alt: "Home page of the Heliograph site, with the project title and a live humidity PSI chart",
+        caption: "Figure 1. Home page of the deployed project.",
+      },
+      {
         type: "p",
         text: "The main screen replays one scenario. A cursor moves through the stream. One chart shows PSI and accuracy, and another compares the reference distribution with the current window. The recommended action is written out in a short note. A checkbox can show where the drift actually started. The monitor does not use that line. It only sees the features and the labels that have arrived.",
+      },
+      {
+        type: "shot",
+        src: "/images/report/observatory-wet-bulb.jpg",
+        alt: "Observatory on the wet-bulb scenario, with humidity shifted and the action set to inspect",
+        caption: "Figure 2. Observatory, wet bulb. Humidity has moved and the action is inspect.",
+      },
+      {
+        type: "shot",
+        src: "/images/report/field-desk.jpg",
+        alt: "Field desk after rotating the decision boundary, with a retrain call and the refit comparison",
+        caption: "Figure 3. Field desk after a boundary change. A refit on the later labels lifts accuracy from 45.2% to 71.7%.",
       },
       {
         type: "table",
@@ -142,6 +161,12 @@ export function buildReport(bench: BenchResult): ReportModel {
         text: `Boundary break is the case where an input test cannot help. PSI at the end of the stream is ${fixed(boundary.endMaxPsi)}, which is below the watch level, and the PSI rule never alarms. ECE rises ${boundary.eceDelay} samples after the drift starts. Page-Hinkley follows at ${boundary.phDelay} samples, and the accuracy rule at ${boundary.accuracyDelay}. Window accuracy falls from about ${percent(clear.refAccuracy)} to ${percent(boundary.endAccuracy)}. The action is retrain. Squall line trips both PSI and ECE at ${squall.psiDelay} samples. I label that case mixed, and the action is also retrain.`,
       },
       {
+        type: "shot",
+        src: "/images/report/observatory-boundary.jpg",
+        alt: "Observatory on boundary break, with overlapping vibration densities and a retrain action",
+        caption: "Figure 4. Observatory, boundary break. The vibration densities still overlap, and the action is retrain.",
+      },
+      {
         type: "p",
         text: `Late letters repeats the boundary break with a label delay of ${late.labelDelay} samples. PSI stays quiet. ECE alarms at ${late.eceDelay} samples, Page-Hinkley at ${late.phDelay}, and the accuracy rule at ${late.accuracyDelay}. All three are after the delay. A method that needs the label cannot detect the change before the label exists. During the wait the inputs still match the reference, which is useful to know, but it does not replace the missing labels.`,
       },
@@ -158,6 +183,12 @@ export function buildReport(bench: BenchResult): ReportModel {
           samplesAfter(score.accuracyDelay),
           callLabel(score.endCall),
         ]),
+      },
+      {
+        type: "shot",
+        src: "/images/report/protocol.jpg",
+        alt: "Protocol page showing zero false alarms in clear air, a humidity delay of 60, and 143 of 144 correct diagnoses",
+        caption: "Figure 5. Protocol page for seed 11, with the 143 of 144 result across seeds 1 to 24.",
       },
       {
         type: "callout",
@@ -243,6 +274,8 @@ export function renderMarkdown(report: ReportModel): string {
       lines.push(`| ${block.headers.map(() => "---").join(" | ")} |`);
       for (const row of block.rows) lines.push(`| ${row.join(" | ")} |`);
       lines.push("");
+    } else if (block.type === "shot") {
+      lines.push(`![${block.alt}](${block.src})`, "", `*${block.caption}*`, "");
     } else if (block.type === "figure") {
       lines.push("The monitoring path is: locked reference, frozen model, sliding window, PSI on inputs, ECE and Page-Hinkley on arrived labels, then hold, inspect, or retrain.", "");
     } else if (block.type === "refs") {
