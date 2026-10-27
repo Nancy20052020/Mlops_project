@@ -1,0 +1,47 @@
+{
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24
+  ],
+  "hits": 143,
+  "trials": 144,
+  "byScenario": {
+    "clear-air": 24,
+    "wet-bulb": 24,
+    "veering-wind": 23,
+    "boundary-break": 24,
+    "squall-line": 24,
+    "late-letters": 24
+  },
+  "misses": [
+    {
+      "seed": 23,
+      "id": "veering-wind",
+      "endDiagnosis": "mixed",
+      "psiDelay": 200,
+      "eceDelay": 660
+    }
+  ]
+}
