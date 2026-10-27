@@ -41,8 +41,16 @@ export function ReportArticle({ report }: { report: ReportModel }) {
         </div>
       </section>
 
-      <div className="report-body mt-12 space-y-4 text-[1.05rem] leading-8">
-        <h2 className="pt-2 text-xl font-semibold">Abstract</h2>
+      <div className="report-body mt-10 space-y-4 text-[1.05rem] leading-8">
+        <h2 className="pt-2 text-xl font-semibold">Screenshots of the site</h2>
+        <p>These pictures are from the deployed project. The home page, the observatory, the field desk, and the protocol page are below.</p>
+        {report.blocks
+          .filter((block) => block.type === "shot")
+          .map((block, index) => (
+            <BlockView key={`shot-${index}`} block={block} section={0} />
+          ))}
+
+        <h2 className="pt-6 text-xl font-semibold">Abstract</h2>
         <p>{report.standfirst}</p>
         <p className="no-print text-sm">
           <a href={COURSE.pdf} className="underline">
@@ -55,6 +63,7 @@ export function ReportArticle({ report }: { report: ReportModel }) {
         </p>
 
         {report.blocks.map((block, index) => {
+          if (block.type === "shot") return null;
           if (block.type === "h2") section += 1;
           return <BlockView key={index} block={block} section={block.type === "h2" ? section : 0} />;
         })}

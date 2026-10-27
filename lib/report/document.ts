@@ -258,7 +258,18 @@ export function renderMarkdown(report: ReportModel): string {
     "",
     report.standfirst,
     "",
+    "## Screenshots of the site",
+    "",
+    "These pictures are from the deployed project.",
+    "",
   ];
+
+  for (const block of report.blocks) {
+    if (block.type === "shot") {
+      const src = block.src.replace(/^\//, "public/");
+      lines.push(`![${block.alt}](${src})`, "", `*${block.caption}*`, "");
+    }
+  }
 
   for (const block of report.blocks) {
     if (block.type === "h2") {
@@ -275,7 +286,7 @@ export function renderMarkdown(report: ReportModel): string {
       for (const row of block.rows) lines.push(`| ${row.join(" | ")} |`);
       lines.push("");
     } else if (block.type === "shot") {
-      lines.push(`![${block.alt}](${block.src})`, "", `*${block.caption}*`, "");
+      continue;
     } else if (block.type === "figure") {
       lines.push("The monitoring path is: locked reference, frozen model, sliding window, PSI on inputs, ECE and Page-Hinkley on arrived labels, then hold, inspect, or retrain.", "");
     } else if (block.type === "refs") {
