@@ -1,106 +1,82 @@
-import Image from "next/image";
 import Link from "next/link";
 import { COURSE } from "@/lib/course";
 import type { Block, ReportModel } from "@/lib/report/document";
 
 export function ReportArticle({ report }: { report: ReportModel }) {
+  let section = 0;
+
   return (
-    <article className="mx-auto max-w-3xl px-5 py-12 md:px-8 md:py-16">
-      <section className="cover-sheet border border-ink/15 bg-paper-deep/40 px-6 py-8 md:px-10 md:py-12">
-        <p className="kicker text-brass">{COURSE.university}</p>
-        <p className="mt-2 text-sm text-ink-soft">
-          {COURSE.school}
-          <br />
-          {COURSE.department}
+    <article className="report-doc mx-auto max-w-3xl px-5 py-10 font-serif text-ink md:px-8 md:py-14">
+      <section className="cover-sheet border border-ink/20 bg-white px-6 py-12 text-center md:px-12 md:py-16">
+        <p className="text-lg font-semibold">{COURSE.university}</p>
+        <p className="mt-2 text-sm leading-6">{COURSE.school}</p>
+        <p className="text-sm leading-6">{COURSE.department}</p>
+
+        <p className="mt-10 text-base font-semibold">
+          {COURSE.code} — {COURSE.subject}
         </p>
-        <p className="display mt-10 text-sm tracking-[0.18em] text-brass">
-          {COURSE.code} · {COURSE.subject}
-        </p>
-        <h1 className="display mt-3 text-4xl leading-[1.02] md:text-5xl">{report.title}</h1>
-        <dl className="mt-10 grid gap-4 text-sm sm:grid-cols-2">
-          <div>
-            <dt className="kicker text-ink-soft">Submitted by</dt>
-            <dd className="mt-1 text-lg">{COURSE.student}</dd>
-          </div>
-          <div>
-            <dt className="kicker text-ink-soft">Registration number</dt>
-            <dd className="mt-1 font-mono text-lg">{COURSE.registration}</dd>
-          </div>
-          <div>
-            <dt className="kicker text-ink-soft">Branch</dt>
-            <dd className="mt-1">{COURSE.branch}</dd>
-          </div>
-          <div>
-            <dt className="kicker text-ink-soft">Course code</dt>
-            <dd className="mt-1 font-mono">{COURSE.code}</dd>
-          </div>
-        </dl>
-        <div className="mt-8 space-y-2 text-sm">
+        <p className="mt-6 text-sm">Research project report</p>
+        <h1 className="mx-auto mt-3 max-w-xl text-2xl font-semibold leading-snug">{report.title}</h1>
+
+        <div className="mt-12 space-y-1 text-sm leading-6">
+          <p>Submitted by</p>
+          <p className="text-base font-semibold">{COURSE.student}</p>
+          <p>Registration number: {COURSE.registration}</p>
+          <p>Branch: {COURSE.branch}</p>
+        </div>
+
+        <div className="mt-10 space-y-2 text-sm leading-6">
           <p>
-            <span className="kicker mr-3 text-ink-soft">Vercel</span>
-            <a href={COURSE.vercel} className="underline decoration-brass underline-offset-4">
+            Deployed project:{" "}
+            <a href={COURSE.vercel} className="underline">
               {COURSE.vercel}
             </a>
           </p>
           <p>
-            <span className="kicker mr-3 text-ink-soft">GitHub</span>
-            <a href={COURSE.github} className="underline decoration-brass underline-offset-4">
+            GitHub:{" "}
+            <a href={COURSE.github} className="underline">
               {COURSE.github}
             </a>
           </p>
         </div>
       </section>
 
-      <p className="kicker mt-14 text-brass">{report.kicker}</p>
-      <h2 className="display mt-4 text-4xl leading-[1.05] text-ink md:text-5xl">The study</h2>
-      <p className="serif mt-8 text-xl leading-8 text-ink-soft">{report.standfirst}</p>
-      <p className="no-print mt-6 flex flex-wrap gap-4 text-sm">
-        <a href={COURSE.pdf} className="underline decoration-brass underline-offset-4">
-          Download the PDF report
-        </a>
-        <Link href="/report/download" className="underline decoration-brass underline-offset-4">
-          Download markdown
-        </Link>
-      </p>
+      <div className="report-body mt-12 space-y-4 text-[1.05rem] leading-8">
+        <h2 className="pt-2 text-xl font-semibold">Abstract</h2>
+        <p>{report.standfirst}</p>
+        <p className="no-print text-sm">
+          <a href={COURSE.pdf} className="underline">
+            Download the PDF report
+          </a>
+          {" · "}
+          <Link href="/report/download" className="underline">
+            Download markdown
+          </Link>
+        </p>
 
-      <figure className="mt-10">
-        <div className="relative aspect-[16/9] overflow-hidden bg-ink">
-          <Image
-            src="/images/instrument-room.jpg"
-            alt="A dim research room with a sunlit sheet of diagrams, a brass protractor, and a glass prism"
-            fill
-            className="object-cover"
-            sizes="(min-width: 768px) 768px, 100vw"
-          />
-        </div>
-        <figcaption className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-soft">
-          The reference window is a locked climate, the way a chart is a locked afternoon.
-        </figcaption>
-      </figure>
-
-      <div className="mt-12 space-y-6">
-        {report.blocks.map((block, index) => (
-          <BlockView key={index} block={block} />
-        ))}
+        {report.blocks.map((block, index) => {
+          if (block.type === "h2") section += 1;
+          return <BlockView key={index} block={block} section={block.type === "h2" ? section : 0} />;
+        })}
       </div>
     </article>
   );
 }
 
-function BlockView({ block }: { block: Block }) {
+function BlockView({ block, section }: { block: Block; section: number }) {
   if (block.type === "h2") {
     return (
-      <h2 id={block.id} className="display scroll-mt-24 pt-8 text-3xl md:text-4xl">
-        {block.text}
+      <h2 id={block.id} className="scroll-mt-24 pt-6 text-xl font-semibold">
+        {section}. {block.text}
       </h2>
     );
   }
   if (block.type === "p") {
-    return <p className="serif text-[1.05rem] leading-8 text-ink/90">{block.text}</p>;
+    return <p>{block.text}</p>;
   }
   if (block.type === "ul") {
     return (
-      <ul className="serif list-disc space-y-3 pl-5 text-[1.05rem] leading-8 text-ink/90">
+      <ul className="list-disc space-y-2 pl-6">
         {block.items.map((item) => (
           <li key={item}>{item}</li>
         ))}
@@ -109,23 +85,21 @@ function BlockView({ block }: { block: Block }) {
   }
   if (block.type === "callout") {
     return (
-      <aside className="border-l-2 border-brass bg-paper-deep/70 px-5 py-4">
-        <p className="kicker text-brass">{block.kicker}</p>
-        <p className="serif mt-2 text-lg leading-8">{block.text}</p>
-      </aside>
+      <p>
+        <strong>{block.kicker}. </strong>
+        {block.text}
+      </p>
     );
   }
   if (block.type === "table") {
     return (
-      <figure className="overflow-x-auto">
-        <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
-          <caption className="mb-3 text-left font-mono text-[11px] uppercase tracking-[0.14em] text-ink-soft">
-            {block.caption}
-          </caption>
+      <figure className="overflow-x-auto py-2">
+        <table className="w-full min-w-[36rem] border-collapse text-left text-sm leading-6">
+          <caption className="mb-2 text-left text-sm">{block.caption}</caption>
           <thead>
-            <tr className="border-b border-ink/20">
+            <tr>
               {block.headers.map((header) => (
-                <th key={header} className="py-2 pr-4 font-medium">
+                <th key={header} className="border border-ink/30 px-2 py-1 font-semibold">
                   {header}
                 </th>
               ))}
@@ -133,9 +107,9 @@ function BlockView({ block }: { block: Block }) {
           </thead>
           <tbody>
             {block.rows.map((row) => (
-              <tr key={row.join("-")} className="border-b border-ink/10">
+              <tr key={row.join("-")}>
                 {row.map((cell, index) => (
-                  <td key={`${cell}-${index}`} className="py-2 pr-4 font-mono text-[13px] tabular-nums">
+                  <td key={`${cell}-${index}`} className="border border-ink/30 px-2 py-1">
                     {cell}
                   </td>
                 ))}
@@ -147,35 +121,17 @@ function BlockView({ block }: { block: Block }) {
     );
   }
   if (block.type === "figure") {
-    return <MethodFigure />;
+    return (
+      <p>
+        The monitoring path is a locked reference, a frozen model, a sliding window, PSI on the inputs, ECE and
+        Page-Hinkley on the labels that have arrived, and then one action: hold, inspect, or retrain.
+      </p>
+    );
   }
   return (
-    <ol className="space-y-3 text-sm leading-6 text-ink-soft">
-      {block.items.map((item, index) => (
-        <li key={item} className="grid grid-cols-[2rem_1fr] gap-2">
-          <span className="font-mono text-xs text-brass">{String(index + 1).padStart(2, "0")}</span>
-          <span>{item}</span>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-function MethodFigure() {
-  const stages = [
-    ["01", "Lock", "Train on the opening climate. Freeze the weights, the threshold, and the reference histograms."],
-    ["02", "Watch inputs", "Population stability on each sensor, every twenty samples, against that locked reference."],
-    ["03", "Watch labels", "Calibration error and Page-Hinkley, computed only on labels that have arrived."],
-    ["04", "Say the action", "Inspect when inputs move. Retrain when calibration breaks. Hold when both are quiet."],
-  ];
-  return (
-    <ol className="grid gap-px border border-ink/15 bg-ink/15 sm:grid-cols-2">
-      {stages.map(([index, title, body]) => (
-        <li key={index} className="bg-paper p-4">
-          <p className="kicker text-brass">{index}</p>
-          <h3 className="display mt-2 text-2xl">{title}</h3>
-          <p className="mt-2 text-sm leading-6 text-ink-soft">{body}</p>
-        </li>
+    <ol className="list-decimal space-y-2 pl-6 text-base leading-7">
+      {block.items.map((item) => (
+        <li key={item}>{item}</li>
       ))}
     </ol>
   );
