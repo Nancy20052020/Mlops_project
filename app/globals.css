@@ -41,6 +41,12 @@ body {
   outline-offset: 3px;
 }
 
+@media (max-width: 700px) {
+  .cover-extra {
+    display: none;
+  }
+}
+
 .display {
   font-family: var(--font-display), Georgia, serif;
   font-optical-sizing: auto;
@@ -191,6 +197,10 @@ input[type="range"]::-moz-range-thumb {
     padding: 0 !important;
   }
 
+  .cover-extra {
+    display: block !important;
+  }
+
   .cover-sheet {
     border: none !important;
     background: white !important;
@@ -239,9 +249,11 @@ input[type="range"]::-moz-range-thumb {
 
   .report-body img {
     display: block;
-    width: 100% !important;
+    width: auto !important;
     max-width: 100% !important;
     height: auto !important;
+    max-height: 10.5cm !important;
+    margin: 0 auto;
     border: 1px solid #444 !important;
   }
 

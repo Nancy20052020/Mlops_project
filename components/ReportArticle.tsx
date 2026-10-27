@@ -6,26 +6,26 @@ export function ReportArticle({ report }: { report: ReportModel }) {
   let section = 0;
 
   return (
-    <article className="report-doc mx-auto max-w-3xl px-5 py-10 font-serif text-ink md:px-8 md:py-14">
-      <section className="cover-sheet border border-ink/20 bg-white px-6 py-12 text-center md:px-12 md:py-16">
+    <article className="report-doc mx-auto max-w-3xl px-5 py-6 font-serif text-ink md:px-8">
+      <section className="cover-sheet border border-ink/20 bg-white px-6 py-5 text-center md:px-10">
         <p className="text-lg font-semibold">{COURSE.university}</p>
-        <p className="mt-2 text-sm leading-6">{COURSE.school}</p>
-        <p className="text-sm leading-6">{COURSE.department}</p>
+        <p className="cover-extra mt-1 text-sm leading-5">{COURSE.school}</p>
+        <p className="cover-extra text-sm leading-5">{COURSE.department}</p>
 
-        <p className="mt-10 text-base font-semibold">
+        <p className="mt-3 text-base font-semibold">
           {COURSE.code} — {COURSE.subject}
         </p>
-        <p className="mt-6 text-sm">Research project report</p>
-        <h1 className="mx-auto mt-3 max-w-xl text-2xl font-semibold leading-snug">{report.title}</h1>
+        <p className="cover-extra mt-2 text-sm">Research project report</p>
+        <h1 className="mx-auto mt-1 max-w-xl text-xl font-semibold leading-snug">{report.title}</h1>
 
-        <div className="mt-12 space-y-1 text-sm leading-6">
-          <p>Submitted by</p>
+        <div className="mt-3 space-y-0.5 text-sm leading-5">
+          <p className="cover-extra">Submitted by</p>
           <p className="text-base font-semibold">{COURSE.student}</p>
           <p>Registration number: {COURSE.registration}</p>
           <p>Branch: {COURSE.branch}</p>
         </div>
 
-        <div className="mt-10 space-y-2 text-sm leading-6">
+        <div className="cover-extra mt-3 space-y-1 text-sm leading-5">
           <p>
             Deployed project:{" "}
             <a href={COURSE.vercel} className="underline">
@@ -41,11 +41,11 @@ export function ReportArticle({ report }: { report: ReportModel }) {
         </div>
       </section>
 
-      <div className="report-body mt-10 space-y-4 text-[1.05rem] leading-8">
+      <div className="report-body mt-6 space-y-4 text-[1.05rem] leading-8">
         <h2 className="pt-2 text-xl font-semibold">Abstract</h2>
         <p>{report.standfirst}</p>
         <p className="no-print text-sm">
-          <a href={COURSE.pdf} className="underline">
+          <a href={`${COURSE.pdf}?v=5`} className="underline">
             Download the PDF report
           </a>
           {" · "}

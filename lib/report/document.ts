@@ -66,6 +66,12 @@ export function buildReport(bench: BenchResult): ReportModel {
     title: "Heliograph: detecting covariate shift and concept drift before retraining",
     standfirst: `This report is for AIM4142 MLOps. I built a small monitoring setup for a gearbox-fault classifier and tested it on simulated wind-turbine data where the type of drift is known. The monitor uses the population stability index on the inputs and expected calibration error on the labels, then picks one action: hold the model, inspect the sensor, or retrain. On seed ${SEED} it gets all six test cases right. Across seeds ${sweep.seeds[0]} to ${sweep.seeds[sweep.seeds.length - 1]} it is right on ${sweep.hits} of ${sweep.trials} runs.`,
     blocks: [
+      {
+        type: "shot",
+        src: "/images/report/home.jpg",
+        alt: "Home page of the Heliograph site, with the project title and a live humidity PSI chart",
+        caption: "Figure 1. Home page of the deployed project.",
+      },
       { type: "h2", id: "problem", text: "Problem statement" },
       {
         type: "p",
@@ -117,13 +123,7 @@ export function buildReport(bench: BenchResult): ReportModel {
       { type: "h2", id: "implementation", text: "Implementation" },
       {
         type: "p",
-        text: `I implemented the project as a Next.js app in TypeScript, without a Python runtime or any API key. The statistics and the simulator are in lib/drift and lib/sim. The dashboard, the field desk, the results table, and this report all call those functions, so the numbers here are the same numbers the tests check. Vitest covers the detectors, the six scenarios on seed 11, and a refit on the labels that arrive after the drift. On the field desk I can change humidity bias, wind shift, how far the boundary rotates, and the label delay, and the same rule responds. The app is deployed at ${COURSE.vercel}. The code is at ${COURSE.github}.`,
-      },
-      {
-        type: "shot",
-        src: "/images/report/home.jpg",
-        alt: "Home page of the Heliograph site, with the project title and a live humidity PSI chart",
-        caption: "Figure 1. Home page of the deployed project.",
+        text: `I implemented the project as a Next.js app in TypeScript, without a Python runtime or any API key. The statistics and the simulator are in lib/drift and lib/sim. The dashboard, the field desk, the results table, and this report all call those functions, so the numbers here are the same numbers the tests check. Vitest covers the detectors, the six scenarios on seed 11, and a refit on the labels that arrive after the drift. On the field desk I can change humidity bias, wind shift, how far the boundary rotates, and the label delay, and the same rule responds. The app is deployed at ${COURSE.vercel}. The code is at ${COURSE.github}. Figure 1 above is that home page.`,
       },
       {
         type: "p",

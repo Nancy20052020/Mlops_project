@@ -16,6 +16,10 @@ AIM4142 MLOps · Nancy Verma · 23FE10CAI00241 · AIML
 
 This report is for AIM4142 MLOps. I built a small monitoring setup for a gearbox-fault classifier and tested it on simulated wind-turbine data where the type of drift is known. The monitor uses the population stability index on the inputs and expected calibration error on the labels, then picks one action: hold the model, inspect the sensor, or retrain. On seed 11 it gets all six test cases right. Across seeds 1 to 24 it is right on 143 of 144 runs.
 
+![Home page of the Heliograph site, with the project title and a live humidity PSI chart](public/images/report/home.jpg)
+
+*Figure 1. Home page of the deployed project.*
+
 ## Problem statement
 
 Once a model is deployed, the data it sees later is not always the data it was trained on. Sometimes only the inputs change. A humidity sensor can start reading higher than it did in training, while the fault logic stays the same. That is covariate shift. Sometimes the relationship changes. The same vibration value may no longer mean the same fault if maintenance practice has changed. That is concept drift. Both can happen together, and the labels that would show it often come in late.
@@ -47,11 +51,7 @@ There are six scenarios. Clear air has no drift. Wet bulb is a sudden humidity b
 
 ## Implementation
 
-I implemented the project as a Next.js app in TypeScript, without a Python runtime or any API key. The statistics and the simulator are in lib/drift and lib/sim. The dashboard, the field desk, the results table, and this report all call those functions, so the numbers here are the same numbers the tests check. Vitest covers the detectors, the six scenarios on seed 11, and a refit on the labels that arrive after the drift. On the field desk I can change humidity bias, wind shift, how far the boundary rotates, and the label delay, and the same rule responds. The app is deployed at https://mlops-project-kohl.vercel.app. The code is at https://github.com/Nancy20052020/Mlops_project.
-
-![Home page of the Heliograph site, with the project title and a live humidity PSI chart](public/images/report/home.jpg)
-
-*Figure 1. Home page of the deployed project.*
+I implemented the project as a Next.js app in TypeScript, without a Python runtime or any API key. The statistics and the simulator are in lib/drift and lib/sim. The dashboard, the field desk, the results table, and this report all call those functions, so the numbers here are the same numbers the tests check. Vitest covers the detectors, the six scenarios on seed 11, and a refit on the labels that arrive after the drift. On the field desk I can change humidity bias, wind shift, how far the boundary rotates, and the label delay, and the same rule responds. The app is deployed at https://mlops-project-kohl.vercel.app. The code is at https://github.com/Nancy20052020/Mlops_project. Figure 1 above is that home page.
 
 The main screen replays one scenario. A cursor moves through the stream. One chart shows PSI and accuracy, and another compares the reference distribution with the current window. The recommended action is written out in a short note. A checkbox can show where the drift actually started. The monitor does not use that line. It only sees the features and the labels that have arrived.
 
