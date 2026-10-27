@@ -37,6 +37,7 @@ import {
   strengthAt,
 } from "@/lib/sim/protocol";
 import { makeRng } from "@/lib/sim/rng";
+import { trainLogistic } from "@/lib/sim/train";
 
 export type Sample = {
   x: number[];
@@ -148,29 +149,9 @@ function generateSamples(scenario: Scenario, seed: number): Sample[] {
 function fitModel(samples: Sample[]): FittedModel {
   const train = samples.slice(0, TRAIN_END);
   const calibration = samples.slice(TRAIN_END, REFERENCE_END);
-  const dimension = FEATURE_COUNT;
-  const weights = new Array<number>(dimension).fill(0);
-  let bias = 0;
-  const epochs = 420;
-
-  for (let epoch = 0; epoch < epochs; epoch++) {
-    const learningRate = 0.45 / (1 + epoch / 90);
-    const gradient = new Array<number>(dimension).fill(0);
-    let biasGradient = 0;
-    for (const sample of train) {
-      const prediction = sigmoid(dot(weights, sample.x) + bias);
-      const error = prediction - sample.y;
-      for (let feature = 0; feature < dimension; feature++) {
-        gradient[feature] += error * sample.x[feature];
-      }
-      biasGradient += error;
-    }
-    const n = train.length;
-    for (let feature = 0; feature < dimension; feature++) {
-      weights[feature] -= learningRate * (gradient[feature] / n + 0.001 * weights[feature]);
-    }
-    bias -= learningRate * (biasGradient / n);
-  }
+  const fitted = trainLogistic(train, 420);
+  const weights = fitted.weights;
+  const bias = fitted.bias;
 
   const trainProbs = train.map((sample) => sigmoid(dot(weights, sample.x) + bias));
   const trainLabels = train.map((sample) => sample.y);

@@ -1,6 +1,18 @@
 # Heliograph: telling covariate shift from concept drift before you retrain
 
-AIM4142 · MLOps research project · Manipal University Jaipur
+Manipal University Jaipur
+School of Computer Science and Engineering
+Department of AI & ML
+
+Course: AIM4142 MLOps
+Submitted by: Nancy Verma
+Registration number: 23FE10CAI00241
+Branch: AIML
+
+GitHub: https://github.com/Nancy20052020/Mlops_project
+Vercel: https://mlops-project-kohl.vercel.app
+
+AIM4142 MLOps · Nancy Verma · 23FE10CAI00241 · AIML
 
 A production fault model can go stale in three different ways, and each one asks for a different response. This project builds a small, fully specified observatory — population stability, calibration error, and a Page-Hinkley residual test — and runs it against a wind-turbine stream whose drift is known by construction. On the reference seed the rule names all six weathers correctly. Across seeds 1–24 it is right on 143 of 144 runs.
 
@@ -37,7 +49,7 @@ Six systems make up the protocol. Clear air is the null. Wet bulb is a sudden tw
 
 ## Implementation
 
-The project is a Next.js application in TypeScript. Statistics, the simulator, and the policy live in plain modules under lib/drift and lib/sim. The observatory, the protocol page, and this report all call those modules, so a number on the page is the number the test asserts. Vitest covers the detectors on synthetic samples and the six scenarios on seed 11. There is no Python runtime and no environment variable, which is what makes the project a direct Vercel deploy: framework preset Next.js, build command next build, and nothing else to configure.
+The project is a Next.js application in TypeScript. Statistics, the simulator, and the policy live in plain modules under lib/drift and lib/sim. The observatory, the field desk, the protocol page, and this report all call those modules, so a number on the page is the number the test asserts. Vitest covers the detectors, the six scenarios on seed 11, and a refit that spends post-front labels. The field desk lets an operator inject humidity bias, wind shift, boundary rotation, and label lag, then watch the same frozen rule respond. There is no Python runtime and no environment variable. The live deployment is https://mlops-project-kohl.vercel.app. The source is https://github.com/Nancy20052020/Mlops_project.
 
 The observatory replays a scenario as a field watch. A playhead walks the precomputed frames. Density curves compare the locked reference with the current window. A paper ticket states the action in a sentence. An answer-key toggle draws the known front; the monitors do not read that line. The background is a slow particle field whose speed follows the severity, and it stays still when the visitor has asked for reduced motion.
 
@@ -101,5 +113,5 @@ The world here is a logistic simulation with one front. Real concept drift is me
 - Webb, G. I., Hyde, R., Cao, H., Nguyen, H. L., and Petitjean, F. Characterizing Concept Drift. Data Mining and Knowledge Discovery, 30(4), 2016.
 - Žliobaitė, I. Learning under Concept Drift: an Overview. arXiv:1010.4784, 2010.
 
-Course: AIM4142 MLOps, Department of AI & ML, School of Computer Science and Engineering, Manipal University Jaipur.
-The interactive instrument and this text are the same program. Deploy the repository on Vercel and open /report.
+Live instrument: https://mlops-project-kohl.vercel.app
+Source and PDF: https://github.com/Nancy20052020/Mlops_project

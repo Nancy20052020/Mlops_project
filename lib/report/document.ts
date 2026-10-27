@@ -1,3 +1,4 @@
+import { COURSE } from "@/lib/course";
 import { scoreById, type BenchResult } from "@/lib/experiments/bench";
 import sweepJson from "@/lib/experiments/sweep.json";
 import { callLabel, fixed, percent, samplesAfter } from "@/lib/format";
@@ -60,7 +61,7 @@ export function buildReport(bench: BenchResult): ReportModel {
   weightRows.push(["Bias", BASE_BIAS.toFixed(2), clear.bias.toFixed(2)]);
 
   return {
-    kicker: "AIM4142 · MLOps research project · Manipal University Jaipur",
+    kicker: `${COURSE.code} ${COURSE.subject} · ${COURSE.student} · ${COURSE.registration} · ${COURSE.branch}`,
     title: "Heliograph: telling covariate shift from concept drift before you retrain",
     standfirst: `A production fault model can go stale in three different ways, and each one asks for a different response. This project builds a small, fully specified observatory — population stability, calibration error, and a Page-Hinkley residual test — and runs it against a wind-turbine stream whose drift is known by construction. On the reference seed the rule names all six weathers correctly. Across seeds ${sweep.seeds[0]}–${sweep.seeds[sweep.seeds.length - 1]} it is right on ${sweep.hits} of ${sweep.trials} runs.`,
     blocks: [
@@ -116,7 +117,7 @@ export function buildReport(bench: BenchResult): ReportModel {
       { type: "h2", id: "implementation", text: "Implementation" },
       {
         type: "p",
-        text: "The project is a Next.js application in TypeScript. Statistics, the simulator, and the policy live in plain modules under lib/drift and lib/sim. The observatory, the protocol page, and this report all call those modules, so a number on the page is the number the test asserts. Vitest covers the detectors on synthetic samples and the six scenarios on seed 11. There is no Python runtime and no environment variable, which is what makes the project a direct Vercel deploy: framework preset Next.js, build command next build, and nothing else to configure.",
+        text: `The project is a Next.js application in TypeScript. Statistics, the simulator, and the policy live in plain modules under lib/drift and lib/sim. The observatory, the field desk, the protocol page, and this report all call those modules, so a number on the page is the number the test asserts. Vitest covers the detectors, the six scenarios on seed 11, and a refit that spends post-front labels. The field desk lets an operator inject humidity bias, wind shift, boundary rotation, and label lag, then watch the same frozen rule respond. There is no Python runtime and no environment variable. The live deployment is ${COURSE.vercel}. The source is ${COURSE.github}.`,
       },
       {
         type: "p",
@@ -211,6 +212,18 @@ export function renderMarkdown(report: ReportModel): string {
   const lines: string[] = [
     `# ${report.title}`,
     "",
+    `${COURSE.university}`,
+    `${COURSE.school}`,
+    `${COURSE.department}`,
+    "",
+    `Course: ${COURSE.code} ${COURSE.subject}`,
+    `Submitted by: ${COURSE.student}`,
+    `Registration number: ${COURSE.registration}`,
+    `Branch: ${COURSE.branch}`,
+    "",
+    `GitHub: ${COURSE.github}`,
+    `Vercel: ${COURSE.vercel}`,
+    "",
     report.kicker,
     "",
     report.standfirst,
@@ -239,8 +252,8 @@ export function renderMarkdown(report: ReportModel): string {
     }
   }
 
-  lines.push("Course: AIM4142 MLOps, Department of AI & ML, School of Computer Science and Engineering, Manipal University Jaipur.");
-  lines.push("The interactive instrument and this text are the same program. Deploy the repository on Vercel and open /report.");
+  lines.push(`Live instrument: ${COURSE.vercel}`);
+  lines.push(`Source and PDF: ${COURSE.github}`);
   lines.push("");
   return lines.join("\n");
 }

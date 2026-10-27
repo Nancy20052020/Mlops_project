@@ -1,18 +1,66 @@
 import Image from "next/image";
 import Link from "next/link";
+import { COURSE } from "@/lib/course";
 import type { Block, ReportModel } from "@/lib/report/document";
 
 export function ReportArticle({ report }: { report: ReportModel }) {
   return (
     <article className="mx-auto max-w-3xl px-5 py-12 md:px-8 md:py-16">
-      <p className="kicker text-brass">{report.kicker}</p>
-      <h1 className="display mt-4 text-4xl leading-[1.05] text-ink md:text-6xl">{report.title}</h1>
+      <section className="cover-sheet border border-ink/15 bg-paper-deep/40 px-6 py-8 md:px-10 md:py-12">
+        <p className="kicker text-brass">{COURSE.university}</p>
+        <p className="mt-2 text-sm text-ink-soft">
+          {COURSE.school}
+          <br />
+          {COURSE.department}
+        </p>
+        <p className="display mt-10 text-sm tracking-[0.18em] text-brass">
+          {COURSE.code} · {COURSE.subject}
+        </p>
+        <h1 className="display mt-3 text-4xl leading-[1.02] md:text-5xl">{report.title}</h1>
+        <dl className="mt-10 grid gap-4 text-sm sm:grid-cols-2">
+          <div>
+            <dt className="kicker text-ink-soft">Submitted by</dt>
+            <dd className="mt-1 text-lg">{COURSE.student}</dd>
+          </div>
+          <div>
+            <dt className="kicker text-ink-soft">Registration number</dt>
+            <dd className="mt-1 font-mono text-lg">{COURSE.registration}</dd>
+          </div>
+          <div>
+            <dt className="kicker text-ink-soft">Branch</dt>
+            <dd className="mt-1">{COURSE.branch}</dd>
+          </div>
+          <div>
+            <dt className="kicker text-ink-soft">Course code</dt>
+            <dd className="mt-1 font-mono">{COURSE.code}</dd>
+          </div>
+        </dl>
+        <div className="mt-8 space-y-2 text-sm">
+          <p>
+            <span className="kicker mr-3 text-ink-soft">Vercel</span>
+            <a href={COURSE.vercel} className="underline decoration-brass underline-offset-4">
+              {COURSE.vercel}
+            </a>
+          </p>
+          <p>
+            <span className="kicker mr-3 text-ink-soft">GitHub</span>
+            <a href={COURSE.github} className="underline decoration-brass underline-offset-4">
+              {COURSE.github}
+            </a>
+          </p>
+        </div>
+      </section>
+
+      <p className="kicker mt-14 text-brass">{report.kicker}</p>
+      <h2 className="display mt-4 text-4xl leading-[1.05] text-ink md:text-5xl">The study</h2>
       <p className="serif mt-8 text-xl leading-8 text-ink-soft">{report.standfirst}</p>
       <p className="no-print mt-6 flex flex-wrap gap-4 text-sm">
+        <a href={COURSE.pdf} className="underline decoration-brass underline-offset-4">
+          Download the PDF report
+        </a>
         <Link href="/report/download" className="underline decoration-brass underline-offset-4">
           Download markdown
         </Link>
-        <span className="text-ink-soft">Print this page to PDF for the submission.</span>
       </p>
 
       <figure className="mt-10">
