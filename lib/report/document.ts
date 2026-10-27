@@ -62,93 +62,92 @@ export function buildReport(bench: BenchResult): ReportModel {
 
   return {
     kicker: `${COURSE.code} ${COURSE.subject} · ${COURSE.student} · ${COURSE.registration} · ${COURSE.branch}`,
-    title: "Heliograph: telling covariate shift from concept drift before you retrain",
-    standfirst: `A production fault model can go stale in three different ways, and each one asks for a different response. This project builds a small, fully specified observatory — population stability, calibration error, and a Page-Hinkley residual test — and runs it against a wind-turbine stream whose drift is known by construction. On the reference seed the rule names all six weathers correctly. Across seeds ${sweep.seeds[0]}–${sweep.seeds[sweep.seeds.length - 1]} it is right on ${sweep.hits} of ${sweep.trials} runs.`,
+    title: "Heliograph: detecting covariate shift and concept drift before retraining",
+    standfirst: `This report is for AIM4142 MLOps. I built a small monitoring setup for a gearbox-fault classifier and tested it on simulated wind-turbine data where the type of drift is known. The monitor uses the population stability index on the inputs and expected calibration error on the labels, then picks one action: hold the model, inspect the sensor, or retrain. On seed ${SEED} it gets all six test cases right. Across seeds ${sweep.seeds[0]} to ${sweep.seeds[sweep.seeds.length - 1]} it is right on ${sweep.hits} of ${sweep.trials} runs.`,
     blocks: [
       { type: "h2", id: "problem", text: "Problem statement" },
       {
         type: "p",
-        text: "A model that was honest on the day it shipped does not stay honest. In production the joint distribution of inputs and labels moves. Sometimes only the inputs move: a humidity probe reads high, or a new season pushes wind speed outside the training envelope. That is covariate shift. Sometimes the relationship itself moves: the same vibration no longer means the same fault, because a maintenance practice changed. That is concept drift. Sometimes both happen in the same hour, and the labels that would reveal it come back from the field much later.",
+        text: "Once a model is deployed, the data it sees later is not always the data it was trained on. Sometimes only the inputs change. A humidity sensor can start reading higher than it did in training, while the fault logic stays the same. That is covariate shift. Sometimes the relationship changes. The same vibration value may no longer mean the same fault if maintenance practice has changed. That is concept drift. Both can happen together, and the labels that would show it often come in late.",
       },
       {
         type: "p",
-        text: "Accuracy is a weak instrument for this. It is dark until labels arrive. A harmless sensor bias and a broken decision boundary can look alike in a single percentage. Retraining on every twitch spends labeling budget. Waiting for a visible collapse ships bad decisions in the meantime. The operational question is narrower than “did the world change?” It is: hold the deployed weights, inspect the sensors, or retrain.",
+        text: "Watching accuracy alone is not enough. Accuracy needs labels, so it is late by definition. It also does not say what to do next. A bad sensor and a changed decision boundary can both reduce accuracy. Retraining on every small input change wastes labels. Waiting until accuracy has already fallen means the model keeps making poor predictions in the meantime.",
       },
       {
         type: "p",
-        text: "Heliograph treats that question as a measurement problem. The setting is a fictional coastal wind farm, the North array, where a logistic model predicts a gearbox fault from six sensors. The world is simulated so every front has a ground truth. The monitors are classical, implemented from their definitions, and frozen before the scenarios are scored.",
+        text: "For this project I used a simulated wind-turbine setting. The classifier predicts a gearbox fault from six sensor readings. Because the data is generated, each scenario has a known ground truth. The monitor is deliberately simple: population stability index (PSI) on the features, and expected calibration error (ECE) on the labels that have arrived. The output is one of three actions. Hold the current weights, inspect the sensor, or retrain.",
       },
       { type: "h2", id: "objectives", text: "Objectives" },
       {
         type: "ul",
         items: [
-          "Implement the population stability index, the two-sample Kolmogorov-Smirnov statistic, Jensen-Shannon divergence, expected calibration error, and a reference-anchored Page-Hinkley test without an ML framework.",
-          "Freeze a logistic fault model on a locked reference window, then stream six weathers with known covariate shift, concept drift, a mixture, and a label delay.",
-          "Compare the ensemble rule with two naive baselines: PSI alone, and a ten-point accuracy drop.",
-          "Publish the instrument as a Vercel application so the same numbers in this report can be replayed, scrubbed, and screenshotted.",
+          "Implement PSI, the two-sample Kolmogorov-Smirnov statistic, Jensen-Shannon divergence, expected calibration error, and a Page-Hinkley test from their definitions.",
+          "Train a logistic regression on a fixed reference window, freeze it, and run six drift scenarios with known causes.",
+          "Compare the combined rule with two simpler baselines: PSI only, and a ten-point drop in accuracy.",
+          "Put the same code on Vercel so the numbers in this report can be checked in the app.",
         ],
       },
       { type: "h2", id: "methodology", text: "Methodology" },
       {
         type: "p",
-        text: `The stream has ${LENGTH} samples and six standardized features: wind speed, vibration, gearbox temperature, rotor speed, humidity, and power. Wind, rotor speed, and power are correlated. Humidity is nearly independent, which makes a probe bias easy to isolate. Labels are Bernoulli draws from a logistic boundary. The base weights are [${BASE_WEIGHTS.map((weight) => weight.toFixed(2)).join(", ")}] with bias ${BASE_BIAS.toFixed(2)}. A concept drift rotates that boundary: vibration changes sign, humidity starts to matter, and power reverses.`,
+        text: `Each run has ${LENGTH} samples and six features: wind speed, vibration, gearbox temperature, rotor speed, humidity, and power. I kept wind, rotor speed, and power correlated, because that is how a turbine actually behaves. Humidity is almost independent of the others, so a fault in that sensor is easy to separate from a real change in the fault logic. Labels are drawn from a logistic model. The true weights are [${BASE_WEIGHTS.map((weight) => weight.toFixed(2)).join(", ")}] with bias ${BASE_BIAS.toFixed(2)}. When I inject concept drift, those weights change: the vibration coefficient flips sign, humidity starts to matter, and the power coefficient reverses.`,
       },
       {
         type: "p",
-        text: `The deployed model is a second logistic regression. It is trained by batch gradient descent on samples 0–${TRAIN_END}, with a light L2 penalty. The decision threshold is chosen to maximize F1 on the calibration slice ${TRAIN_END}–${REFERENCE_END}, then frozen. On that slice the reference model reaches ${percent(clear.refAccuracy)} accuracy and an expected calibration error of ${fixed(clear.refEce, 3)}. Learned weights follow the true signs on the strong features. They do not match the true magnitudes, because wind, rotor speed, and power carry the same information and the fit is free to split weight among them.`,
+        text: `The deployed model is a second logistic regression. I trained it with batch gradient descent on samples 0 to ${TRAIN_END}, with a small L2 penalty, and chose the threshold that maximises F1 on samples ${TRAIN_END} to ${REFERENCE_END}. After that the weights are frozen. On the calibration slice the accuracy is ${percent(clear.refAccuracy)} and the ECE is ${fixed(clear.refEce, 3)}. The learned signs match the true signs on the important features. The magnitudes do not match exactly, because wind, rotor speed, and power carry overlapping information and the fit can split the weight between them.`,
       },
       {
         type: "p",
-        text: `A front arrives at sample ${ONSET}. Until then every scenario is the same weather, drawn from seed ${SEED}. Monitors use a sliding window of ${WINDOW} samples, stepped every 20. Input drift is the worst population stability index across the six features, binned by reference quantiles. The textbook bands are 0.10 and 0.25. The worst-of-six maximum sits near 0.16 even in clear air, so the watch is placed at ${PSI_WATCH.toFixed(2)}, just above that null, and the alarm stays at the textbook ${PSI_ALARM.toFixed(2)}. Kolmogorov-Smirnov and Jensen-Shannon are computed and shown. They do not vote, because a p-value on a large window calls tiny shifts significant.`,
+        text: `The drift starts at sample ${ONSET}. Before that, every scenario uses the same stream from seed ${SEED}. I check a sliding window of ${WINDOW} samples every 20 steps. For inputs I take the worst PSI across the six features, using quantile bins from the reference. The usual bands are 0.10 and 0.25. With six features the worst PSI can reach about 0.16 even when nothing has changed, so I set the watch level at ${PSI_WATCH.toFixed(2)} and kept the alarm at ${PSI_ALARM.toFixed(2)}. I also compute the KS statistic and Jensen-Shannon divergence, but they are only shown. I did not use them in the decision, because a p-value on a large window flags very small shifts.`,
       },
       {
         type: "p",
-        text: `Concept drift is read from labels that have actually arrived. In five scenarios the label is immediate. In Late letters it arrives ${late.labelDelay} samples after the observation. Expected calibration error is computed on the latest window once at least ${LABEL_MIN} labels are in hand. A rise of ${ECE_ALARM.toFixed(2)} above the calibration-slice ECE is a concept alarm. Page-Hinkley watches the squared residual against the reference mean, with slack δ = ${PH_DELTA} and threshold λ = ${PH_LAMBDA}. It is reported beside the rule. The decision itself uses PSI and calibration, which an operator can read without a sequential-test appendix.`,
+        text: `For concept drift I only use labels that have already arrived. In five scenarios the label is available immediately. In Late letters it arrives ${late.labelDelay} samples later. ECE is computed once the window has at least ${LABEL_MIN} labels. If ECE rises by ${ECE_ALARM.toFixed(2)} above the reference, that is a concept alarm. I also run a Page-Hinkley test on the squared residual, with delta ${PH_DELTA} and lambda ${PH_LAMBDA}. It is reported next to the decision. The decision itself uses PSI and ECE, which are easier to explain.`,
       },
       {
         type: "p",
-        text: "The action is pre-registered. Input alarm alone: inspect the feed and keep the weights. Concept alarm, whether or not the inputs also moved: retrain. Otherwise: hold. A separate accuracy baseline retrains when accuracy falls ten points below the pre-onset median and stays there for two windows. That baseline never sees the scenario name. Neither does the ensemble.",
+        text: `I fixed the rule before looking at the scores. If only the inputs alarm, the action is to inspect the sensor and keep the weights. If calibration alarms, the action is to retrain, even if the inputs also moved. Otherwise the action is to hold. The accuracy baseline is separate. It retrains when accuracy falls by ${ACCURACY_DROP.toFixed(2)} from the median before the drift and stays down for two windows. That baseline does not know which scenario it is in. The combined rule does not either.`,
       },
-      { type: "figure" },
       {
         type: "p",
-        text: "Six systems make up the protocol. Clear air is the null. Wet bulb is a sudden two-standard-deviation humidity bias. Veering wind is a slow 1.45-standard-deviation rise in wind speed across 380 samples. Boundary break rotates the logistic weights with no change in the inputs. Squall line does both at once. Late letters is the boundary break again, with inspection labels delayed by 280 samples.",
+        text: "There are six scenarios. Clear air has no drift. Wet bulb is a sudden humidity bias of two standard deviations. Veering wind is a slow rise in wind speed of 1.45 standard deviations over 380 samples. Boundary break changes the logistic weights and leaves the inputs alone. Squall line does both at once. Late letters is the same boundary change, but the labels are delayed by 280 samples.",
       },
       { type: "h2", id: "implementation", text: "Implementation" },
       {
         type: "p",
-        text: `The project is a Next.js application in TypeScript. Statistics, the simulator, and the policy live in plain modules under lib/drift and lib/sim. The observatory, the field desk, the protocol page, and this report all call those modules, so a number on the page is the number the test asserts. Vitest covers the detectors, the six scenarios on seed 11, and a refit that spends post-front labels. The field desk lets an operator inject humidity bias, wind shift, boundary rotation, and label lag, then watch the same frozen rule respond. There is no Python runtime and no environment variable. The live deployment is ${COURSE.vercel}. The source is ${COURSE.github}.`,
+        text: `I implemented the project as a Next.js app in TypeScript, without a Python runtime or any API key. The statistics and the simulator are in lib/drift and lib/sim. The dashboard, the field desk, the results table, and this report all call those functions, so the numbers here are the same numbers the tests check. Vitest covers the detectors, the six scenarios on seed 11, and a refit on the labels that arrive after the drift. On the field desk I can change humidity bias, wind shift, how far the boundary rotates, and the label delay, and the same rule responds. The app is deployed at ${COURSE.vercel}. The code is at ${COURSE.github}.`,
       },
       {
         type: "p",
-        text: "The observatory replays a scenario as a field watch. A playhead walks the precomputed frames. Density curves compare the locked reference with the current window. A paper ticket states the action in a sentence. An answer-key toggle draws the known front; the monitors do not read that line. The background is a slow particle field whose speed follows the severity, and it stays still when the visitor has asked for reduced motion.",
+        text: "The main screen replays one scenario. A cursor moves through the stream. One chart shows PSI and accuracy, and another compares the reference distribution with the current window. The recommended action is written out in a short note. A checkbox can show where the drift actually started. The monitor does not use that line. It only sees the features and the labels that have arrived.",
       },
       {
         type: "table",
-        caption: "True boundary against the frozen deployed weights on seed 11. Collinear wind, rotor speed, and power explain the split.",
+        caption: "True weights and the weights learned on seed 11. Wind, rotor speed, and power overlap, so the fit does not recover the exact values.",
         headers: ["Term", "Truth", "Deployed"],
         rows: weightRows,
       },
       { type: "h2", id: "results", text: "Results" },
       {
         type: "p",
-        text: `On seed ${SEED} the settled diagnosis matches the ground truth in all six systems. Clear air produces no input alarm, no calibration alarm, no Page-Hinkley crossing, and no accuracy alarm. Wet bulb trips PSI at ${wet.psiDelay} samples after the front. The dominant feature is humidity. Calibration, Page-Hinkley, and the accuracy rule all stay silent, so the call is inspect: the probe moved, and the boundary still describes the labels.`,
+        text: `On seed ${SEED} the final diagnosis matches the ground truth in all six scenarios. In clear air, PSI, ECE, Page-Hinkley, and the accuracy rule all stay quiet, and the action is hold. In wet bulb, PSI crosses 0.25 at ${wet.psiDelay} samples after the drift starts, and the feature responsible is humidity. ECE does not rise, so the action is inspect. The sensor moved. The decision boundary did not.`,
       },
       {
         type: "p",
-        text: `Veering wind is the same kind of shift, stretched out. PSI crosses 0.25 at ${wind.psiDelay} samples, later than the sudden probe, and the settled call is again inspect. Accuracy never falls ten points. The envelope moved. The probabilities are still honest.`,
+        text: `Veering wind is the same kind of change, but slower. PSI crosses 0.25 at ${wind.psiDelay} samples, which is later than the sudden humidity bias. The final action is again inspect. Accuracy does not fall by ten points. The inputs left the training range, and the probabilities are still reasonable.`,
       },
       {
         type: "p",
-        text: `Boundary break is the case input monitors cannot see. End-of-stream PSI is ${fixed(boundary.endMaxPsi)}, under the watch band, and the PSI rule stays silent. Calibration error rises by sample ${ONSET + (boundary.eceDelay ?? 0)} — a delay of ${boundary.eceDelay}. Page-Hinkley follows at ${boundary.phDelay}, and the accuracy rule at ${boundary.accuracyDelay}. Window accuracy falls from a pre-onset level near ${percent(clear.refAccuracy)} to ${percent(boundary.endAccuracy)}. The call is retrain. Squall line trips both channels at ${squall.psiDelay} samples and is named mixed, which also retrains.`,
+        text: `Boundary break is the case where an input test cannot help. PSI at the end of the stream is ${fixed(boundary.endMaxPsi)}, which is below the watch level, and the PSI rule never alarms. ECE rises ${boundary.eceDelay} samples after the drift starts. Page-Hinkley follows at ${boundary.phDelay} samples, and the accuracy rule at ${boundary.accuracyDelay}. Window accuracy falls from about ${percent(clear.refAccuracy)} to ${percent(boundary.endAccuracy)}. The action is retrain. Squall line trips both PSI and ECE at ${squall.psiDelay} samples. I label that case mixed, and the action is also retrain.`,
       },
       {
         type: "p",
-        text: `Late letters repeats the boundary break with a ${late.labelDelay}-sample label lag. PSI stays silent. Calibration fires at ${late.eceDelay} samples after the front, Page-Hinkley at ${late.phDelay}, and the accuracy rule at ${late.accuracyDelay}. All three sit past the lag. That is a physical limit: a monitor that needs Y cannot beat the time Y takes to arrive. What the ensemble adds during the wait is a sentence. The inputs still match the reference, and the performance instruments are dark because the letters are late.`,
+        text: `Late letters repeats the boundary break with a label delay of ${late.labelDelay} samples. PSI stays quiet. ECE alarms at ${late.eceDelay} samples, Page-Hinkley at ${late.phDelay}, and the accuracy rule at ${late.accuracyDelay}. All three are after the delay. A method that needs the label cannot detect the change before the label exists. During the wait the inputs still match the reference, which is useful to know, but it does not replace the missing labels.`,
       },
       {
         type: "table",
-        caption: "Samples after the front on seed 11. Silent means that rule never fired. The call is the action at the end of the stream.",
+        caption: "Samples after the drift starts, seed 11. Silent means that rule never fired. The last column is the action at the end of the run.",
         headers: ["System", "Truth", "PSI", "ECE", "Page-Hinkley", "Accuracy", "Call"],
         rows: bench.scores.map((score) => [
           score.name,
@@ -162,25 +161,25 @@ export function buildReport(bench: BenchResult): ReportModel {
       },
       {
         type: "callout",
-        kicker: "What the baselines miss",
-        text: `PSI is the right tool for Wet bulb and Veering wind, and it is blind on both concept-drift systems. The accuracy rule is blind on both covariate systems, and on Late letters it waits out the same lag as calibration. The useful object is the pair: which channel fired, and therefore which action to take.`,
+        kicker: "Comparison with the baselines",
+        text: `PSI catches Wet bulb and Veering wind, and it misses both concept-drift cases. The accuracy rule misses both covariate cases. On Late letters it is as late as ECE, because both of them wait for labels. Using the two signals together is what makes the action specific.`,
       },
       {
         type: "p",
-        text: `The same protocol on seeds ${sweep.seeds[0]} through ${sweep.seeds[sweep.seeds.length - 1]} is correct on ${sweep.hits} of ${sweep.trials} scenario runs. Clear air, Wet bulb, Boundary break, Squall line, and Late letters are correct on all ${sweep.seeds.length} seeds. The single miss is Veering wind on seed ${miss.seed}: PSI fires, and much later the calibration error also rises (ECE delay ${miss.eceDelay}), so the settled label is ${miss.endDiagnosis} rather than covariate. A long shift in a feature the model actually uses can bruise calibration. The rule then asks for a retrain. That is the conservative mistake, and it is reported rather than tuned away.`,
+        text: `I repeated the six scenarios on seeds ${sweep.seeds[0]} to ${sweep.seeds[sweep.seeds.length - 1]}. The final diagnosis is correct on ${sweep.hits} of ${sweep.trials} runs. Clear air, Wet bulb, Boundary break, Squall line, and Late letters are correct on every seed. The one miss is Veering wind on seed ${miss.seed}. PSI fires, and much later ECE also rises (delay ${miss.eceDelay}), so the final label is ${miss.endDiagnosis} instead of covariate. A long shift in a feature the model actually uses can affect calibration. The rule then asks for a retrain. I left this result in, because changing the threshold to hide one seed would be fitting the test.`,
       },
       { type: "h2", id: "conclusion", text: "Conclusion" },
       {
         type: "p",
-        text: "Input stability and calibration answer different questions. A sensor can leave the training support while P(Y|X) holds, and the right spend is an engineer with the probe, not a new training run. The decision boundary can move while every marginal looks familiar, and in that case the inputs will never raise the alarm. Label delay sets a floor under every performance monitor. Heliograph’s contribution is the diagnosis that falls out of running those instruments side by side, with the thresholds written down before the score.",
+        text: "PSI and calibration are answering different questions. If a sensor leaves the training range and P(Y|X) is unchanged, the practical next step is to check the sensor. Retraining does not fix a biased probe. If the decision boundary changes while the inputs still look normal, PSI will stay quiet and only the labels will show the problem. If those labels are delayed, every method that needs them is delayed by at least that much. The useful part of this project is running the two checks side by side and writing the threshold down before scoring the scenarios.",
       },
       {
         type: "p",
-        text: "The setting is the one MLOps teams already occupy: a model card with a reference window, a feature store that can drift, a labeling loop that is slow, and a retraining job that is expensive. Population stability is standard in credit scorecards. Calibration plots are standard wherever probabilities are acted on. Page-Hinkley is a classical sequential test for a change in level. None of the pieces is exotic. The failure mode this project is aimed at is using only one of them.",
+        text: "This is a common MLOps situation. There is a reference window from training, features that can drift, a labelling step that is slow, and a retraining job that costs time. PSI is already used in credit scorecards. Calibration plots are used wherever a probability is acted on. Page-Hinkley is an old test for a change in the mean. I am not claiming a new detector. The point is that using only one of these checks leads to the wrong action.",
       },
       {
         type: "p",
-        text: "The world here is a logistic simulation with one front. Real concept drift is messier, categorical features need their own bins, and a deep model can lose calibration for reasons this linear fit never sees. Five-bin ECE is coarse. The watch threshold was lifted from 0.10 to 0.18 because of the max over six features; another feature set would need its own null. Recurring and seasonal drift are outside the protocol. Those are reasons to carry the same three instruments into a real pipeline, with a reference window taken from training data and a label-arrival clock taken from the warehouse, and to keep the rule as explicit as the one in this report.",
+        text: "The data here is a logistic simulation with one change point. Real drift is messier. Categorical features need their own bins, and a neural network can become miscalibrated for reasons this linear model does not show. ECE with five bins is rough in a short window. I raised the PSI watch level from 0.10 to 0.18 because I was taking the maximum over six features. Another feature set would need its own check on data with no drift. Seasonal drift is not in these six scenarios. The same two measurements can still be used on a real pipeline if the reference window comes from training data and the label delay is taken from the actual labelling process.",
       },
       { type: "h2", id: "references", text: "References" },
       {
@@ -252,8 +251,8 @@ export function renderMarkdown(report: ReportModel): string {
     }
   }
 
-  lines.push(`Live instrument: ${COURSE.vercel}`);
-  lines.push(`Source and PDF: ${COURSE.github}`);
+  lines.push(`Deployed project: ${COURSE.vercel}`);
+  lines.push(`GitHub: ${COURSE.github}`);
   lines.push("");
   return lines.join("\n");
 }

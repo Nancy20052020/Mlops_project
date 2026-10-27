@@ -155,28 +155,97 @@ input[type="range"]::-moz-range-thumb {
     display: none !important;
   }
 
-  body {
-    background: white;
+  html,
+  body,
+  main,
+  article,
+  p,
+  li,
+  td,
+  th,
+  h1,
+  h2,
+  h3,
+  caption,
+  a,
+  strong,
+  span,
+  dt,
+  dd {
+    font-family: "Liberation Serif", "Times New Roman", Times, serif !important;
+    color: black !important;
+    background: white !important;
+    letter-spacing: normal !important;
   }
 
+  body,
   main {
-    padding-top: 0 !important;
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .report-doc {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   .cover-sheet {
+    border: none !important;
+    background: white !important;
+    box-shadow: none !important;
+    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     break-after: page;
     page-break-after: always;
+    padding: 0 12% !important;
   }
 
-  a[href^="http"]::after {
-    content: " (" attr(href) ")";
-    font-size: 0.85em;
-    word-break: break-all;
+  .cover-sheet h1 {
+    font-size: 18pt !important;
+    font-weight: bold !important;
+    line-height: 1.35 !important;
+  }
+
+  .cover-sheet p {
+    font-size: 12pt !important;
+    line-height: 1.45 !important;
+  }
+
+  .report-body {
+    padding: 0 6%;
+  }
+
+  .report-body h2 {
+    font-size: 14pt !important;
+    font-weight: bold !important;
+    margin-top: 16pt !important;
+    page-break-after: avoid;
+  }
+
+  .report-body p,
+  .report-body li {
+    font-size: 12pt !important;
+    line-height: 1.5 !important;
+    orphans: 3;
+    widows: 3;
   }
 
   table,
-  figure,
-  aside {
+  figure {
     break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  th,
+  td {
+    border: 1px solid black !important;
+    padding: 3px 6px !important;
+    font-size: 10pt !important;
   }
 }
