@@ -206,10 +206,6 @@ input[type="range"]::-moz-range-thumb {
     padding: 0 12% !important;
   }
 
-  .report-body h2:first-child {
-    break-before: auto;
-  }
-
   .cover-sheet h1 {
     font-size: 18pt !important;
     font-weight: bold !important;

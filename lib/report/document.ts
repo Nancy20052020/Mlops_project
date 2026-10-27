@@ -136,6 +136,10 @@ export function buildReport(bench: BenchResult): ReportModel {
         caption: "Figure 2. Observatory, wet bulb. Humidity has moved and the action is inspect.",
       },
       {
+        type: "p",
+        text: "The field desk uses the same rule, with the inputs left open. I rotated the decision boundary and cast it. The action came back as retrain, and a new fit on the labels after the change lifted accuracy on the later window from 45.2% to 71.7%.",
+      },
+      {
         type: "shot",
         src: "/images/report/field-desk.jpg",
         alt: "Field desk after rotating the decision boundary, with a retrain call and the refit comparison",
@@ -258,18 +262,7 @@ export function renderMarkdown(report: ReportModel): string {
     "",
     report.standfirst,
     "",
-    "## Screenshots of the site",
-    "",
-    "These pictures are from the deployed project.",
-    "",
   ];
-
-  for (const block of report.blocks) {
-    if (block.type === "shot") {
-      const src = block.src.replace(/^\//, "public/");
-      lines.push(`![${block.alt}](${src})`, "", `*${block.caption}*`, "");
-    }
-  }
 
   for (const block of report.blocks) {
     if (block.type === "h2") {
@@ -286,7 +279,8 @@ export function renderMarkdown(report: ReportModel): string {
       for (const row of block.rows) lines.push(`| ${row.join(" | ")} |`);
       lines.push("");
     } else if (block.type === "shot") {
-      continue;
+      const src = block.src.replace(/^\//, "public/");
+      lines.push(`![${block.alt}](${src})`, "", `*${block.caption}*`, "");
     } else if (block.type === "figure") {
       lines.push("The monitoring path is: locked reference, frozen model, sliding window, PSI on inputs, ECE and Page-Hinkley on arrived labels, then hold, inspect, or retrain.", "");
     } else if (block.type === "refs") {
