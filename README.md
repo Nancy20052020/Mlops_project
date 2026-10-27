@@ -2,6 +2,13 @@
 
 Heliograph is a research instrument for a production question: when a model goes stale, do you hold the weights, inspect the sensors, or retrain?
 
+**Nancy Verma** · registration `23FE10CAI00241` · branch AIML  
+**AIM4142 MLOps** · Department of AI & ML · Manipal University Jaipur
+
+- Live app: https://mlops-project-kohl.vercel.app
+- Source: https://github.com/Nancy20052020/Mlops_project
+- PDF report: [`public/Nancy-Verma-AIM4142-Heliograph-Report.pdf`](public/Nancy-Verma-AIM4142-Heliograph-Report.pdf)
+
 It is the project for **AIM4142 MLOps**, Department of AI & ML, School of Computer Science and Engineering, Manipal University Jaipur. The topic is model monitoring: covariate shift, concept drift, label delay, and a pre-registered retraining rule.
 
 A frozen logistic model watches a simulated coastal wind farm. Six seeded weathers arrive. Population stability index, expected calibration error, and a Page-Hinkley test on the residuals each get a vote. The same TypeScript modules feed the observatory, the protocol table, the written report, and the test suite, so the page and the paper cannot disagree.
@@ -19,10 +26,12 @@ Open [http://localhost:3000](http://localhost:3000).
 | Path | What it is |
 | --- | --- |
 | `/` | The ridge, and the three ways a model fails |
-| `/observatory` | Replay a weather. Space plays, arrows step |
+| `/observatory` | Replay a weather. Space plays, arrows step. A refit shows what new labels would buy |
+| `/desk` | Cast your own front: humidity, wind, boundary, label lag |
 | `/protocol` | The six-system scoreboard |
-| `/report` | Problem, method, results, conclusion |
+| `/report` | Problem, method, results, conclusion, with the Vercel and GitHub links |
 | `/report/download` | The same report as Markdown |
+| `/Nancy-Verma-AIM4142-Heliograph-Report.pdf` | The submission PDF |
 
 `npm run bench` prints the seed-11 scores. `npm run report` rewrites `REPORT.md` from the live numbers.
 

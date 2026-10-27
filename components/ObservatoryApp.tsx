@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { reliability } from "@/lib/drift/calibration";
 import { DensityChart } from "@/components/DensityChart";
+import { RefitPanel } from "@/components/RefitPanel";
 import { SiteHeader } from "@/components/SiteChrome";
 import { TimelineChart } from "@/components/TimelineChart";
 import { WeatherField } from "@/components/WeatherField";
@@ -252,6 +253,7 @@ export function ObservatoryApp() {
                     <Metric label="Labels in window" value={String(frame.labeled)} note={study.scenario.labelDelay ? `lag ${study.scenario.labelDelay}` : "no lag"} />
                   </div>
                   <Reliability bins={bins} ready={labeled.length >= LABEL_MIN} />
+                  <RefitPanel study={study} />
                   <button type="button" onClick={download} className="justify-self-start font-mono text-[11px] uppercase tracking-[0.14em] text-paper/60 underline decoration-white/20 underline-offset-4">
                     Download this run as CSV
                   </button>

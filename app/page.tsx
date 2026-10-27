@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HeroInstrument } from "@/components/HeroInstrument";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
+import { COURSE } from "@/lib/course";
 import { getBench, scoreById } from "@/lib/experiments/bench";
 import sweep from "@/lib/experiments/sweep.json";
 
@@ -18,7 +19,9 @@ export default function HomePage() {
         <section className="grid lg:min-h-[calc(100vh-4.5rem)] lg:grid-cols-12">
           <div className="flex flex-col justify-between px-5 py-10 md:px-10 lg:col-span-7 lg:py-14">
             <div>
-              <p className="kicker rise text-brass">AIM4142 · MLOps · Manipal University Jaipur</p>
+              <p className="kicker rise text-brass">
+                {COURSE.code} · {COURSE.subject} · {COURSE.student} · {COURSE.registration}
+              </p>
               <h1 className="display rise delay-1 mt-5 max-w-xl text-[3.3rem] leading-[0.92] md:text-7xl">
                 Watch a model age in the weather.
               </h1>
@@ -29,6 +32,9 @@ export default function HomePage() {
               <div className="rise delay-3 mt-8 flex flex-wrap items-center gap-5">
                 <Link href="/observatory" className="bg-ink px-5 py-3 text-sm text-paper transition hover:bg-sea">
                   Enter the observatory
+                </Link>
+                <Link href="/desk" className="text-sm underline decoration-brass underline-offset-4">
+                  Cast a front
                 </Link>
                 <Link href="/report" className="text-sm underline decoration-brass underline-offset-4">
                   Read the report

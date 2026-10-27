@@ -162,4 +162,21 @@ input[type="range"]::-moz-range-thumb {
   main {
     padding-top: 0 !important;
   }
+
+  .cover-sheet {
+    break-after: page;
+    page-break-after: always;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    word-break: break-all;
+  }
+
+  table,
+  figure,
+  aside {
+    break-inside: avoid;
+  }
 }
