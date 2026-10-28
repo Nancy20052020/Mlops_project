@@ -84,12 +84,6 @@ export function SiteFooter() {
           <a href={COURSE.github} className="underline decoration-brass underline-offset-4">
             github.com/Nancy20052020/Mlops_project
           </a>
-          <a
-            href="/Nancy-Verma-Industrial-Training-Report.pdf?v=2"
-            className="underline decoration-brass underline-offset-4"
-          >
-            Industrial training report (PDF)
-          </a>
         </p>
       </div>
     </footer>
