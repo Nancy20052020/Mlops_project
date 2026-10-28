@@ -85,7 +85,7 @@ export function SiteFooter() {
             github.com/Nancy20052020/Mlops_project
           </a>
           <a
-            href="/Nancy-Verma-Industrial-Training-Report.pdf"
+            href="/Nancy-Verma-Industrial-Training-Report.pdf?v=2"
             className="underline decoration-brass underline-offset-4"
           >
             Industrial training report (PDF)
